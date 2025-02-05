@@ -59,7 +59,7 @@ local function create_compl_window(buffer, height_)
 
 	log_debug("Creating window opt: " .. vim.inspect(opts))
 	local f_type = vim.bo.filetype
-	local status, err = pcall(vim.api.nvim_buf_set_option, buffer, "filetype", f_type)
+	local status, err = pcall(vim.api.nvim_set_option_value, "filetype", f_type, { buf = buffer })
 	if not status then
 		utils.log_debug("Error while creating window " .. vim.inspect(err))
 	end
