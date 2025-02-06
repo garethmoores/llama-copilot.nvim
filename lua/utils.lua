@@ -119,10 +119,12 @@ utils.append_to_buffer = append_to_buffer
 local function append_to_buffe_line(buf, str, line)
   local new_lines = vim.split(str, "\n")
 
-  local status, err = pcall(vim.api.nvim_buf_set_text, buf, line, 0, line, 0, new_lines)
-  if not status then
-    log_debug("Error while appending to buffer at line (" .. line .. "): " .. vim.inspect(err))
-  end
+  -- local status, err = pcall(vim.api.nvim_buf_set_text, buf, line, 0, line, 0, new_lines)
+  --vim.api.nvim_buf_set_text(buf, line, 0, line,  0, new_lines)
+  vim.api.nvim_paste(str, false, -1)
+  -- if not status then
+  --  log_debug("Error while appending to buffer at line (" .. line .. "): " .. vim.inspect(err))
+  --end
 end
 utils.append_to_buffe_line = append_to_buffe_line
 
