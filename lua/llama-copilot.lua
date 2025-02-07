@@ -11,7 +11,7 @@ local default_config = {
   model = "codellama:7b-code",
   max_completion_size = 15, -- use -1 for limitless
   debug = false,
-  custom_preprompt = "",
+  default_custom_preprompt = "",
   vertical_completion_window = false,
 }
 M.config = {}
@@ -121,13 +121,22 @@ local function request(prompt)
 end
 
 -- Start code completion
-local function generate_code()
+local function generate_code(opts)
   log_debug(":LlamaCopilotComplete command")
   -- Get above code
   M.line = vim.api.nvim_win_get_cursor(0)[1]
   local lines_arr = vim.api.nvim_buf_get_lines(0, 0, M.line, false)
 
-  local prompt = M.config.custom_preprompt .. table.concat(lines_arr, "\n")
+  -- add pre-prompt from Vim command call, if that's empty, then add the default one from the Vim setup.
+  local preprompt = ""
+  if opts.fargs[1] == nil or opts.fargs[1] == "" or opts.fargs[1] == "()" then
+    preprompt = M.config.default_custom_preprompt
+  else
+    preprompt = opts.fargs[1]
+  end
+
+  print("Calling AI with prompt: " .. preprompt)
+  local prompt = preprompt .. table.concat(lines_arr, "\n")
 
   if M.config.vertical_completion_window then
     M.float_win = utils.create_vertical_compl_window(M.res_buff)
@@ -164,7 +173,7 @@ end
 vim.api.nvim_create_user_command(
   "LlamaCopilotComplete",
   generate_code,
-  { desc = "Use Ollama AI to generate a solution." }
+  { desc = "Use Ollama AI to generate a solution.", nargs = 1 }
 )
 vim.api.nvim_create_user_command(
   "LlamaCopilotAccept",
